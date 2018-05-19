@@ -842,26 +842,29 @@ MulticopterPositionControl::reset_alt_sp()
 void
 MulticopterPositionControl::limit_altitude()
 {
-	float altitude_above_home = -(_pos(2) - _home_pos.z);
-	bool applying_flow_height_limit = false;
 
-	if (_terrain_follow && _local_pos.limit_hagl) {
-		// Don't allow the height setpoint to exceed the optical flow limits
-		if (_pos_sp(2) < -_flow_max_hgt.get()) {
-			_pos_sp(2) = -_flow_max_hgt.get();
-		}
+	// Calculate altitude limit
+	float altitude_limit = INFINITY;
 
-		applying_flow_height_limit = true;
+	if (_terrain_follow) {
+		altitude_limit = fmaxf(-_local_pos.hagl_max, -_vehicle_land_detected.alt_max);
 
-	} else if (_run_alt_control && (_vehicle_land_detected.alt_max > 0.0f)
-		   && (altitude_above_home > _vehicle_land_detected.alt_max)) {
-		// we are above maximum altitude
-		_pos_sp(2) = -_vehicle_land_detected.alt_max +  _home_pos.z;
+		//printf("terrain follow alt limit : %f\n", altitude_limit);
 
+	} else {
+		altitude_limit = fmaxf(-_local_pos.hagl_max + _pos(2) + _local_pos.dist_bottom,
+				       -_vehicle_land_detected.alt_max + _home_pos.z);
+
+		//printf("altitude follow alt limit : %f\n", altitude_limit);
 	}
 
+	// Don't allow the height setpoint to exceed the limits
+	if (_pos_sp(2) < altitude_limit) {
+		_pos_sp(2) = altitude_limit;
+	}
+
+	// We want to fly upwards. Check that vehicle does not exceed altitude
 	if (!_run_alt_control && _vel_sp(2) <= 0.0f) {
-		// we want to fly upwards: check if vehicle does not exceed altitude
 
 		// time to reach zero velocity
 		float delta_t = -_vel(2) / _acceleration_z_max_down.get();
@@ -869,16 +872,9 @@ MulticopterPositionControl::limit_altitude()
 		// predict next position based on current position, velocity, max acceleration downwards and time to reach zero velocity
 		float pos_z_next = _pos(2) + _vel(2) * delta_t + 0.5f * _acceleration_z_max_down.get() * delta_t *delta_t;
 
-
-		if (!applying_flow_height_limit && (-(pos_z_next - _home_pos.z) > _vehicle_land_detected.alt_max)
-		    && (_vehicle_land_detected.alt_max > 0.0f)) {
+		if (pos_z_next < altitude_limit) {
 			// prevent the vehicle from exceeding maximum altitude by switching back to altitude control with maximum altitude as setpoint
-			_pos_sp(2) = -_vehicle_land_detected.alt_max + _home_pos.z;
-			_run_alt_control = true;
-
-		} else if (applying_flow_height_limit && (pos_z_next < -_flow_max_hgt.get())) {
-			// prevent the vehicle from exceeding maximum altitude by switching back to altitude control with maximum altitude as setpoint
-			_pos_sp(2) = -_flow_max_hgt.get();
+			_pos_sp(2) = altitude_limit;
 			_run_alt_control = true;
 		}
 	}
@@ -2433,6 +2429,7 @@ MulticopterPositionControl::calculate_velocity_setpoint()
 	}
 
 	// encourage pilot to respect flow sensor minimum height limitations
+	/*
 	if (_terrain_follow && _local_pos.limit_hagl
 		&& _control_mode.flag_control_manual_enabled
 	    && _control_mode.flag_control_altitude_enabled) {
@@ -2443,7 +2440,7 @@ MulticopterPositionControl::calculate_velocity_setpoint()
 			_pos_sp(2) -= climb_rate_bias * _dt;
 
 		}
-	}
+	}*/
 
 	/* limit vertical downwards speed (positive z) close to ground
 	 * for now we use the altitude above home and assume that we want to land at same height as we took off */
@@ -2982,15 +2979,13 @@ MulticopterPositionControl::task_main()
 		/* set dt for control blocks */
 		setDt(dt);
 
-		/* set default max velocity in xy to vel_max
-		 * Apply estimator limits if applicable */
-		if (_local_pos.vxy_max > 0.001f) {
-			// use the minimum of the estimator and user specified limit
-			_vel_max_xy = fminf(_vel_max_xy_param.get(), _local_pos.vxy_max);
-			// Allow for a minimum of 0.3 m/s for repositioning
-			_vel_max_xy = fmaxf(_vel_max_xy, 0.3f);
+		// apply estimator velocity limit
+		// use the minimum of the estimator and user specified limit
+		_vel_max_xy = fminf(_vel_max_xy_param.get(), _local_pos.vxy_max);
+		// Allow for a minimum of 0.3 m/s for repositioning
+		_vel_max_xy = fmaxf(_vel_max_xy, 0.3f);
 
-		} else if (_vel_sp_significant) {
+		if (_vel_sp_significant) {
 			// raise the limit at a constant rate up to the user specified value
 			if (_vel_max_xy >= _vel_max_xy_param.get()) {
 				_vel_max_xy = _vel_max_xy_param.get();
