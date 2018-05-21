@@ -77,6 +77,10 @@ pipeline {
           builds["eagle (linux)"] = createBuildNodeDockerLogin(docker_snapdragon, 'docker_hub_dagar', 'posix_eagle_default')
           builds["eagle (qurt)"] = createBuildNodeDockerLogin(docker_snapdragon, 'docker_hub_dagar', 'qurt_eagle_default')
 
+          // snapdragon (excelsior_default)
+          builds["excelsior (linux)"] = createBuildNodeDockerLogin(docker_snapdragon, 'docker_hub_dagar', 'posix_excelsior_default')
+          builds["excelsior (qurt)"] = createBuildNodeDockerLogin(docker_snapdragon, 'docker_hub_dagar', 'qurt_excelsior_default')
+
           // MAC OS posix_sitl_default
           builds["sitl (OSX)"] = {
             node("mac") {
