@@ -2429,10 +2429,10 @@ MulticopterPositionControl::calculate_velocity_setpoint()
 	}
 
 	// encourage pilot to respect flow sensor minimum height limitations
-	/*
-	if (_terrain_follow && _local_pos.limit_hagl
+	if (_terrain_follow
+		&& _local_pos.hagl_min > 0.0f
 		&& _control_mode.flag_control_manual_enabled
-	    && _control_mode.flag_control_altitude_enabled) {
+		&& _control_mode.flag_control_altitude_enabled) {
 		// If distance to ground is less than limit, increment set point upwards at up to the landing descent rate
 		if (_local_pos.dist_bottom < _flow_min_hgt.get()) {
 			float climb_rate_bias = fminf(1.5f * _pos_p(2) * (_flow_min_hgt.get() - _local_pos.dist_bottom), _land_speed.get());
@@ -2440,7 +2440,7 @@ MulticopterPositionControl::calculate_velocity_setpoint()
 			_pos_sp(2) -= climb_rate_bias * _dt;
 
 		}
-	}*/
+	}
 
 	/* limit vertical downwards speed (positive z) close to ground
 	 * for now we use the altitude above home and assume that we want to land at same height as we took off */
