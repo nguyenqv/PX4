@@ -1,6 +1,6 @@
 /****************************************************************************
  *
- *   Copyright (c) 2019-2022 PX4 Development Team. All rights reserved.
+ *   Copyright (c) 2023 PX4 Development Team. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -31,76 +31,62 @@
  *
  ****************************************************************************/
 
-/**
- * @file AKM_AK09916_registers.hpp
- *
- * Asahi Kasei Microdevices (AKM) AK09916 registers.
- *
- */
+#include "ICM45686.hpp"
 
-#pragma once
+#include <px4_platform_common/getopt.h>
+#include <px4_platform_common/module.h>
 
-#include <cstdint>
-
-namespace AKM_AK09916
+void ICM45686::print_usage()
 {
+	PRINT_MODULE_USAGE_NAME("icm42688p", "driver");
+	PRINT_MODULE_USAGE_SUBCATEGORY("imu");
+	PRINT_MODULE_USAGE_COMMAND("start");
+	PRINT_MODULE_USAGE_PARAMS_I2C_SPI_DRIVER(false, true);
+	PRINT_MODULE_USAGE_PARAM_INT('R', 0, 0, 35, "Rotation", true);
+	PRINT_MODULE_USAGE_PARAM_INT('C', 0, 0, 35000, "Input clock frequency (Hz)", true);
+	PRINT_MODULE_USAGE_DEFAULT_COMMANDS();
+}
 
-// TODO: move to a central header
-static constexpr uint8_t Bit0 = (1 << 0);
-static constexpr uint8_t Bit1 = (1 << 1);
-static constexpr uint8_t Bit2 = (1 << 2);
-static constexpr uint8_t Bit3 = (1 << 3);
-static constexpr uint8_t Bit4 = (1 << 4);
-static constexpr uint8_t Bit5 = (1 << 5);
-static constexpr uint8_t Bit6 = (1 << 6);
-static constexpr uint8_t Bit7 = (1 << 7);
+extern "C" int icm45686_main(int argc, char *argv[])
+{
+	int ch;
+	using ThisDriver = ICM45686;
+	BusCLIArguments cli{false, true};
+	cli.default_spi_frequency = SPI_SPEED;
 
-static constexpr uint32_t I2C_SPEED = 400 * 1000; // 400 kHz I2C serial interface
-static constexpr uint8_t I2C_ADDRESS_DEFAULT = 0b0001100;
+	while ((ch = cli.getOpt(argc, argv, "C:R:")) != EOF) {
+		switch (ch) {
+		case 'C':
+			cli.custom1 = atoi(cli.optArg());
+			break;
 
-static constexpr uint8_t Company_ID = 0x48;
-static constexpr uint8_t Device_ID = 0x09;
-static constexpr uint8_t Device_ID_AK09918 = 0x0C;
+		case 'R':
+			cli.rotation = (enum Rotation)atoi(cli.optArg());
+			break;
+		}
+	}
 
-enum class Register : uint8_t {
-	WIA1  = 0x00, // Company ID of AKM
-	WIA2  = 0x01, // Device ID of AK09916
+	const char *verb = cli.optArg();
 
-	ST1   = 0x10, // Status 1
-	HXL   = 0x11,
-	HXH   = 0x12,
-	HYL   = 0x13,
-	HYH   = 0x14,
-	HZL   = 0x15,
-	HZH   = 0x16,
+	if (!verb) {
+		ThisDriver::print_usage();
+		return -1;
+	}
 
-	ST2   = 0x18, // Status 2
+	BusInstanceIterator iterator(MODULE_NAME, cli, DRV_IMU_DEVTYPE_ICM45686);
 
-	CNTL2 = 0x31, // Control 2
-	CNTL3 = 0x32, // Control 3
-};
+	if (!strcmp(verb, "start")) {
+		return ThisDriver::module_start(cli, iterator);
+	}
 
-// ST1
-enum ST1_BIT : uint8_t {
-	DOR  = Bit1, // Data overrun
-	DRDY = Bit0, // Data is ready
-};
+	if (!strcmp(verb, "stop")) {
+		return ThisDriver::module_stop(iterator);
+	}
 
-// ST2
-enum ST2_BIT : uint8_t {
-	HOFL = Bit3, // Magnetic sensor overflow
-};
+	if (!strcmp(verb, "status")) {
+		return ThisDriver::module_status(iterator);
+	}
 
-// CNTL2
-enum CNTL2_BIT : uint8_t {
-	// MODE[4:0] bits
-	MODE3_SET   = Bit2 | Bit1, // “00110”: Continuous measurement mode 3 (50Hz)
-	MODE3_CLEAR = Bit4 | Bit3 | Bit0,
-};
-
-// CNTL3
-enum CNTL3_BIT : uint8_t {
-	SRST = Bit0,
-};
-
-} // namespace AKM_AK09916
+	ThisDriver::print_usage();
+	return -1;
+}

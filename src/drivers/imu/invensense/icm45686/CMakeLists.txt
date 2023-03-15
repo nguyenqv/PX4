@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2023 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,28 +30,19 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
-
-px4_add_git_submodule(TARGET git_gps_devices PATH "devices")
-
 px4_add_module(
-	MODULE drivers__gps
-	MAIN gps
+	MODULE drivers__imu__invensense__icm45686
+	MAIN icm45686
 	COMPILE_FLAGS
-		-Wno-stringop-overflow # due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91707
+		${MAX_CUSTOM_OPT_LEVEL}
+		#-DDEBUG_BUILD
 	SRCS
-		gps.cpp
-		devices/src/crc.cpp
-		devices/src/gps_helper.cpp
-		devices/src/mtk.cpp
-		devices/src/ashtech.cpp
-		devices/src/ubx.cpp
-		devices/src/rtcm.cpp
-		devices/src/emlid_reach.cpp
-		devices/src/femtomes.cpp
-		devices/src/nmea.cpp
-		devices/src/unicore.cpp
-	MODULE_CONFIG
-		module.yaml
+		icm45686_main.cpp
+		ICM45686.cpp
+		ICM45686.hpp
+		InvenSense_ICM45686_registers.hpp
 	DEPENDS
-		git_gps_devices
+		px4_work_queue
+		drivers_accelerometer
+		drivers_gyroscope
 	)
