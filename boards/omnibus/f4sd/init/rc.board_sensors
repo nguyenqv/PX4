@@ -16,3 +16,5 @@ then
 fi
 
 bmp280 -s start
+vl53l1x -X start
+pmw3901 -s start
