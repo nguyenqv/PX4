@@ -15,8 +15,10 @@ You can also follow the official guide [here](https://docs.px4.io/master/en/flig
 ### Setup quick guide:
 * Step 1: Clone this repo and ``` git checkout px4v1133omnibus```.
 * Step 2: run ``` git submodule update --init --recursive```.
-* Step 3: run ``` make omnibus_f4sd upload``` if using OmnibusF4 boards, check [here](https://docs.px4.io/master/en/dev_setup/building_px4.html#building-for-nuttx) if compiling for other boards.
-* Step 4: plug in the flight controller and flash the firmware.
+* Step 3: run ``` git remote add upstream https://github.com/PX4/PX4-Autopilot.git ```.
+* Step 4: run ``` git fetch upstream --tags ```.
+* Step 5: run ``` make omnibus_f4sd upload``` if using OmnibusF4 boards, check [here](https://docs.px4.io/master/en/dev_setup/building_px4.html#building-for-nuttx) if compiling for other boards.
+* Step 6: plug in the flight controller and flash the firmware.
 
 ### Wiring guide:
 * PWM1: Left motor
