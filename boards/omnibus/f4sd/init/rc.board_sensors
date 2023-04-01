@@ -16,3 +16,5 @@ then
 fi
 
 bmp280 -s start
+vl53l1x -X start
+thoneflow start -d dev/ttyS1

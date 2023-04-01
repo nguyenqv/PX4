@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# @name Tailless Flapping Wings
+#
+# @type Flapping Wings
+# @class Copter
+#
+# @output MAIN1 left motor 1
+# @output MAIN2 right motor 2
+# @output MAIN3 left servo 1
+# @output MAIN4 right servo 2
+#
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+set MIXER hummingbird
+set PWM_OUT 1234
+
+param set-default EKF2_AID_MASK 2
+param set-default EKF2_MAG_TYPE 5
+param set-default EKF2_HGT_MODE 2
+param set-default EKF2_MAG_CHECK 0
+
+param set-default BAT1_N_CELLS 1
+param set-default BAT1_V_CHARGED 4.20
+
+param set-default COM_FLTMODE1 6
+param set-default COM_FLTMODE2 6
+param set-default COM_FLTMODE3 1
+param set-default COM_FLTMODE4 1
+param set-default COM_FLTMODE6 2
+param set-default COM_RC_IN_MODE 0
+
+param set-default MPC_ALT_MODE 2
+param set-default MPC_LAND_ALT1 5.0000
+param set-default MPC_LAND_ALT2 2.0000
+param set-default MPC_POS_MODE 3
+param set-default MPC_THR_HOVER 0.4600
+
+param set-default IMU_ACCEL_CUTOFF 10.0000
+param set-default IMU_DGYRO_CUTOFF 10.0000
+param set-default IMU_GYRO_CUTOFF 10.0000
+param set-default IMU_GYRO_RATEMAX 400
+
+param set-default LNDMC_ALT_GND -1.0000
+param set-default MAN_ARM_GESTURE 0
+
+param set-default MAV_0_CONFIG 6
+param set-default MAV_0_FLOW_CTRL 2
+param set-default MAV_0_FORWARD 1
+param set-default MAV_0_MODE 0
+param set-default MAV_0_RADIO_CTL 1
+param set-default MAV_0_RATE 92160
+
+param set-default MC_PITCHRATE_D 0.0065
+param set-default MC_PITCHRATE_I 0.0000
+param set-default MC_PITCHRATE_P 0.2500
+param set-default MC_PITCH_P 6.0000
+param set-default MC_ROLLRATE_D 0.0010
+param set-default MC_ROLLRATE_I 0.0000
+param set-default MC_ROLLRATE_MAX 150.0000
+param set-default MC_ROLLRATE_P 0.1000
+param set-default MC_ROLL_P 6.0000
+param set-default MC_YAWRATE_I 0.0000
+param set-default MC_YAWRATE_K 0.3000
+param set-default MC_YAW_P 4.0000
+
+param set-default PWM_AUX_OUT 1234
+param set-default PWM_MAIN_DIS1 -1
+param set-default PWM_MAIN_DIS2 -1
+param set-default PWM_MAIN_DIS3 1500
+param set-default PWM_MAIN_DIS4 1500
+param set-default PWM_MAIN_MAX 2000
+param set-default PWM_MAIN_MAX1 -1
+param set-default PWM_MAIN_MAX2 -1
+param set-default PWM_MAIN_MAX3 1700
+param set-default PWM_MAIN_MAX4 1700
+param set-default PWM_MAIN_MIN1 -1
+param set-default PWM_MAIN_MIN2 -1
+param set-default PWM_MAIN_MIN3 1300
+param set-default PWM_MAIN_MIN4 1300
+param set-default PWM_MAIN_OUT 1234
+param set-default PWM_MAIN_REV3 1
+
+param set-default SENS_EN_VL53L1X 1
+param set-default SENS_TFLOW_CFG 102
+param set-default SER_URT6_BAUD 921600
+param set-default SYS_HAS_GPS 0
