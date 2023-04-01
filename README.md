@@ -4,7 +4,7 @@
 
 ### Customized PX4 fimware for flapping wing based on v1.13.3.
 
-### Mixer file modified: [hummingbird.main.mix](https://github.com/mamariomiamo/hummingbird/blob/omni-flap/ROMFS/px4fmu_common/mixers/hummingbird.main.mix).
+### Mixer file modified: [hummingbird.main.mix](https://github.com/nguyenqv/TLPX4/blob/px4v1133omnibus/ROMFS/px4fmu_common/mixers/hummingbird.main.mix).
 
 ### PX4 mixer logic can be found [here](https://docs.px4.io/master/en/concept/mixing.html).
 
@@ -17,11 +17,6 @@ You can also follow the official guide [here](https://docs.px4.io/master/en/flig
 * Step 2: run ``` git submodule update --init --recursive```.
 * Step 3: run ``` make omnibus_f4sd upload``` if using OmnibusF4 boards, check [here](https://docs.px4.io/master/en/dev_setup/building_px4.html#building-for-nuttx) if compiling for other boards.
 * Step 4: plug in the flight controller and flash the firmware.
-* Step 5: Download and upload the parameter file [here](https://github.com/mamariomiamo/hummingbird/blob/omni-flap/generic.params).
-
-
-### Generic parameter files
-Generic param can be downloaded [here](https://github.com/mamariomiamo/hummingbird/blob/omni-flap/generic.params), you will need to upload the param multiple times to write all parameters sucessfully.
 
 ### Wiring guide:
 * PWM1: Left motor
